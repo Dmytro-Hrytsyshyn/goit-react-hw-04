@@ -1,53 +1,92 @@
-import { useState, useEffect } from "react";
-import toast, { Toaster } from "react-hot-toast";
+import { useEffect, useState } from "react";
 import "./App.css";
-import axios from "axios";
 
-import SearchBar from "./components/SearchBar.jsx/SearchBar";
+import SearchBar from "./components/SearchBar/SearchBar";
 import ImageGallery from "./components/ImageGallery/ImageGallery";
+import ImageModal from "./components/ImageModal/ImageModal";
+import Loader from "./components/Loader/Loader";
+
+import fetchPhotos from "/src/api";
+import ErrorMessage from "./components/ErrorMessage/ErrorMessage";
+import LoadMoreBtn from "./components/LoadMoreBtn/LoadMoreBtn";
 
 function App() {
-  const [photos, setPhotos] = useState([]);
-  const [value, setValue] = useState("");
-  const [query, setQuery] = useState(""); // Для відстеження пошукового запиту
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [image, setImage] = useState([]);
+  const [page, setPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(null);
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    if (value.trim() === "") {
-      toast.error("Текстове поле повинно бути заповнене"); // Нічого не робити, якщо поле порожнє
+  const [userQuery, setUserQuery] = useState("");
+  const [modalData, setModalData] = useState([]);
+
+  useEffect(() => {
+    if (!userQuery) {
+      return;
     }
-    setQuery(value); // Оновлюємо запит, викликавши useEffect
-    setValue("");
+
+    (async () => {
+      setIsLoading(true);
+      const response = await fetchPhotos(userQuery, page);
+
+      if (response.status >= 400 || response.data.results.length === 0) {
+        setIsError(true);
+        setIsLoading(false);
+        return;
+      }
+      setTotalPage(response.data.total_pages);
+
+      setIsLoading(false);
+      setIsError(false);
+
+      setImage((prevImages) => {
+        return [...prevImages, ...response.data.results];
+      });
+    })();
+  }, [userQuery, page]);
+
+  const onHandleSubmit = (query) => {
+    setImage([]);
+
+    setPage(1);
+    setUserQuery(query);
   };
 
-  // Виклик API Unsplash для отримання фото
-  useEffect(() => {
-    const fetchPhotos = async () => {
-      try {
-        const { data } = await axios.get(
-          `https://api.unsplash.com/search/photos?query=${query}&client_id=oy3O76jK3fZVKx5w7V5H6wYC5qDQ4exG1RaF-9t3ra0`
-        );
-        setPhotos(data.results); // Зберігаємо отримані фото
-      } catch (error) {
-        console.error("Error fetching data", error);
-      }
-    };
+  const onOpenModal = (data) => {
+    setModalIsOpen(true);
+    setModalData(data);
+  };
 
-    if (query) {
-      // Викликаємо fetchPhotos лише якщо є значення query
-      fetchPhotos();
-    }
-  }, [query]); // Виклик useEffect коли змінюється query
+  const onCloseModal = () => {
+    setModalIsOpen(false);
+    setModalData(null);
+  };
+
+  const onLoadMore = () => {
+    setIsLoading(true);
+    setPage(page + 1);
+    setIsLoading(false);
+  };
 
   return (
     <div>
-      <SearchBar
-        handleSubmit={handleSubmit}
-        value={value}
-        setValue={setValue}
-      />
-      <Toaster position="top-right" reverseOrder={true} />;
-      <ImageGallery photos={photos} />
+      <SearchBar onHandleSubmit={onHandleSubmit} />
+      <ImageGallery data={image} onImageOpen={onOpenModal} />
+      {modalData && (
+        <ImageModal
+          modalData={modalData}
+          onImageClose={onCloseModal}
+          isOpen={modalIsOpen}
+        />
+      )}
+
+      {isLoading && <Loader />}
+      {isError && <ErrorMessage />}
+
+      {image.length !== 0 && page < totalPage && (
+        <LoadMoreBtn onLoadMore={onLoadMore} />
+      )}
     </div>
   );
 }

@@ -1,0 +1,16 @@
+.loadMoreBtn {
+  margin-left: 800px;
+  margin-top: 30px;
+  width: 100px;
+  height: 35px;
+  background-color: rgb(31, 34, 209);
+  color: white;
+  border-radius: 8px;
+  border-style: none;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.loadMoreBtn:hover {
+  background-color: rgb(64, 66, 221);
+}

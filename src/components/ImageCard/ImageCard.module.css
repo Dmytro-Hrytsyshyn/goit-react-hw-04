@@ -1,0 +1,39 @@
+.imageCard {
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 250px;
+  height: 200px;
+  margin-bottom: 40px;
+}
+
+.image {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+.contentList {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  padding: 0;
+  gap: 20px;
+  align-items: center;
+}
+
+.contentListItem {
+  display: flex;
+}
+
+.content {
+  margin: 0;
+  padding: 0;
+  font-size: 12px;
+}
+
+.authorImage {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+}

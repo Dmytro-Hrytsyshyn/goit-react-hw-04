@@ -1,16 +1,27 @@
-import ImageCard from "./ImageCard/ImageCard.jsx";
+import ImageCard from "/src/components/ImageCard/ImageCard";
+
 import css from "./ImageGallery.module.css";
 
-function ImageGallery({ photos }) {
+const ImageGallery = ({ data, onImageOpen }) => {
   return (
-    <ul className={css.photos_list}>
-      {photos.map((photo) => (
-        <li key={photo.id}>
-          <ImageCard photo={photo} />
-        </li>
-      ))}
-    </ul>
+    <div>
+      <ul className={css.imageList}>
+        {data.length === 0 ? (
+          <li>
+            <div>
+              <img src="" alt="" />
+            </div>
+          </li>
+        ) : (
+          data.map((image) => (
+            <li key={image.id}>
+              <ImageCard data={image} onOpenModal={onImageOpen} />
+            </li>
+          ))
+        )}
+      </ul>
+    </div>
   );
-}
+};
 
 export default ImageGallery;

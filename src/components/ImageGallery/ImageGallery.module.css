@@ -1,7 +1,11 @@
-.photos_list {
-  padding: 30px;
-  margin-top: 50px;
+.imageList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
   display: flex;
-  gap: 10px;
   flex-wrap: wrap;
+  gap: 20px;
+  row-gap: 40px;
+  justify-content: center;
+  align-items: center;
 }
